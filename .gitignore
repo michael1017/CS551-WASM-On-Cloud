@@ -1,0 +1,6 @@
+pytorch/wasmedge/rust/target/*
+pytorch/wasmedge/rust/Cargo.lock
+
+openvino/wasmedge/rust/target/*
+openvino/wasmedge/rust/Cargo.lock
+
