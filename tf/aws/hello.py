@@ -7,6 +7,7 @@ import io
 import matplotlib.pyplot as plt
 import sys
 import json
+import time
 
 def solve(input_string):
     input_string = input_string[1:-1]
@@ -42,8 +43,11 @@ def solve(input_string):
     interpreter.set_tensor(input_details[0]['index'], input_tensor)
 
     # Run inference
+    start_time = time.time()
     interpreter.invoke()
-
+    end_time = time.time()
+    print(f"model inference: {end_time - start_time} seconds")
+    
     # Get output tensor
     output_details = interpreter.get_output_details()
     output_tensor = interpreter.get_tensor(output_details[0]['index'])
@@ -77,7 +81,10 @@ def solve(input_string):
 def lambda_handler(event, context):
     # TODO implement
     temp = str(json.dumps(event['body'])).strip()
-    print(temp)
+    start_time = time.time()
+    result = solve(temp)
+    end_time = time.time()
+    print(f"total time: {end_time - start_time} seconds")
     return {
         'statusCode': 200,
         'headers': {
@@ -85,5 +92,5 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT"
         },
-        'body': solve(temp)
+        'body': result
     }

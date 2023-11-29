@@ -2,6 +2,7 @@ import azure.functions as func
 import datetime
 import json
 import logging
+import time
 
 import os
 import tensorflow as tf
@@ -47,7 +48,10 @@ def solve(input_string):
     interpreter.set_tensor(input_details[0]['index'], input_tensor)
 
     # Run inference
+    start_time = time.time()
     interpreter.invoke()
+    end_time = time.time()
+    logging.info(f"model inference: {end_time - start_time} seconds")
 
     # Get output tensor
     output_details = interpreter.get_output_details()
@@ -79,13 +83,13 @@ def solve(input_string):
 def classify(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Python HTTP trigger function processed a request.")
     req_body_bytes = req.get_body()
-
-    logging.info(f"Request Bytes: {req_body_bytes}")
     req_body = req_body_bytes.decode("utf-8")
-    logging.info(f"Request: {req_body}")
-    logging.info(f"{type(req_body)}")
 
-
+    start_time = time.time()
+    result = solve(req_body)
+    end_time = time.time()
+    logging.info(f"total time: {end_time - start_time} seconds")
+    
     return func.HttpResponse(
         solve(req_body),
         status_code=200,
