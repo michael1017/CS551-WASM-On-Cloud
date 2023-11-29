@@ -29,6 +29,9 @@ def test_latency(num_requests, url_link):
         # query = f"curl -X POST {url_link} -d {image_object}"
         # os.system(query)
         start = perf_counter()
+        # FOR GCP AND AZURE DO THE FOLLOWING SAME IN SCALE TEST
+        # image_object = {"img": image_object}
+        # response = requests.post(url_link,json=image_object)
         response = requests.post(url_link, data=image_object)
         # print(response.text)
         end = perf_counter()
@@ -50,6 +53,7 @@ def record_data(url_link):
 
 
 if __name__ == "__main__":
+    # REPLACE URL with GCP and AZURE
     url_link = "https://xb28uuj612.execute-api.us-east-2.amazonaws.com/default/aws_lambda_classify_pytorch_wasm"
     print(url_link)
 
