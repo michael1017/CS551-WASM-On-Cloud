@@ -5,7 +5,17 @@ import requests
 import binascii
 from time import perf_counter
 import os
+import base64
 
+
+def convert_image_to_base64(file_name):
+    base64_img = ""
+    with open(file_name, 'rb') as img_file:
+        # Read the image file
+        img_data = img_file.read()
+        # Encode image data to base64 string
+        base64_img = base64.b64encode(img_data).decode('utf-8')
+    return base64_img
 
 def convert_image_to_hex(file_name):
     hex_value = ""
@@ -16,15 +26,18 @@ def convert_image_to_hex(file_name):
 
 def test_latency(num_requests, url_link):
     avg_latency = 0
-    image_hex = []
+    image_list = []
     times = []
     for (dir_path, dir_names, file_names) in os.walk("Images"):        
         for file_name in file_names:
             file_path = dir_path + "/" + file_name
-            image_hex.append(convert_image_to_hex(file_path))
+            if is_base64:
+                image_list.append(convert_image_to_base64(file_path))
+            else:
+                image_list.append(convert_image_to_hex(file_path))
 
     for _ in range(num_requests):
-        image_object = random.choice(image_hex)
+        image_object = random.choice(image_list)
         # DO NOT DELETE
         # query = f"curl -X POST {url_link} -d {image_object}"
         # os.system(query)
@@ -64,6 +77,7 @@ def record_data(url_link):
 
 
 is_gcp_test = False
+is_base64 = False
 if __name__ == "__main__":
     # REPLACE URL with GCP and AZURE
     # url_link = "https://xb28uuj612.execute-api.us-east-2.amazonaws.com/default/aws_lambda_classify_pytorch_wasm"
@@ -74,9 +88,14 @@ if __name__ == "__main__":
     # AZURE MOBILENET
     # url_link = "https://classifytf2.azurewebsites.net/api/classify"
     
-    # GCP MOBILENET
-    url_link = "https://us-central1-curious-context-406603.cloudfunctions.net/function-1"
+    # AZURE RESNET
+    url_link = "https://newtestresnet.azurewebsites.net/api/httptrigger?code=ZrcylRyiNsbpXhkGnrPxideuF-QFwGh2e_iYlRqc3qBiAzFu3wfK_Q%3D%3D"
+    is_base64 = True
     is_gcp_test = True
-
+        
+    # GCP MOBILENET
+    # url_link = "https://us-central1-curious-context-406603.cloudfunctions.net/function-1"
+    # is_gcp_test = True
+    
     print(url_link)
     print(record_data(url_link))

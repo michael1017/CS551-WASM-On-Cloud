@@ -2,7 +2,7 @@ import functions_framework
 import datetime
 import json
 import logging
-import time
+from time import perf_counter
 
 import os
 import tensorflow as tf
@@ -46,10 +46,10 @@ def solve(input_string):
     interpreter.set_tensor(input_details[0]['index'], input_tensor)
 
     # Run inference
-    start_time = time.time()
+    start_inference = perf_counter()
     interpreter.invoke()
-    end_time = time.time()
-    print(f"model inference: {end_time - start_time} seconds")
+    end_inference = perf_counter()
+    print(f"model inference: {end_inference - start_inference} seconds")
 
     # Get output tensor
     output_details = interpreter.get_output_details()
@@ -92,13 +92,14 @@ def hello_http(request):
     request_json = request.get_json(silent=True)
     request_args = request.args
 
-    start_time = time.time()
+    start_time = perf_counter()
     if request_json and 'img' in request_json:
         result = solve(request_json['img'])
     elif request_args and 'img' in request_args:
         result = solve(request_args['img'])
     else:
         result = 'No Match Handler'
-    end_time = time.time()
+    end_time = perf_counter()
+    
     print(f"total time: {end_time - start_time}")
     return '{}'.format(result)

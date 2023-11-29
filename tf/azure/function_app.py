@@ -91,6 +91,6 @@ def classify(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(f"total time: {end_time - start_time} seconds")
     
     return func.HttpResponse(
-        solve(req_body),
+        result,
         status_code=200,
     )

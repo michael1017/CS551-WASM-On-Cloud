@@ -7,7 +7,7 @@ import io
 import matplotlib.pyplot as plt
 import sys
 import json
-import time
+from time import perf_counter
 
 def solve(input_string):
     input_string = input_string[1:-1]
@@ -43,10 +43,10 @@ def solve(input_string):
     interpreter.set_tensor(input_details[0]['index'], input_tensor)
 
     # Run inference
-    start_time = time.time()
+    start_inference = perf_counter()
     interpreter.invoke()
-    end_time = time.time()
-    print(f"model inference: {end_time - start_time} seconds")
+    end_inference = perf_counter()
+    print(f"model inference: {end_inference - start_inference} seconds")
     
     # Get output tensor
     output_details = interpreter.get_output_details()
@@ -81,9 +81,9 @@ def solve(input_string):
 def lambda_handler(event, context):
     # TODO implement
     temp = str(json.dumps(event['body'])).strip()
-    start_time = time.time()
+    start_time = perf_counter()
     result = solve(temp)
-    end_time = time.time()
+    end_time = perf_counter()
     print(f"total time: {end_time - start_time} seconds")
     return {
         'statusCode': 200,
