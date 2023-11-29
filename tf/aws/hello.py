@@ -10,6 +10,8 @@ import json
 from time import perf_counter
 
 def solve(input_string):
+    start_time = perf_counter()
+    
     input_string = input_string[1:-1]
     print(input_string[:10])
     # Load the model
@@ -46,7 +48,6 @@ def solve(input_string):
     start_inference = perf_counter()
     interpreter.invoke()
     end_inference = perf_counter()
-    print(f"model inference: {end_inference - start_inference} seconds")
     
     # Get output tensor
     output_details = interpreter.get_output_details()
@@ -71,7 +72,13 @@ def solve(input_string):
     class_name = labels[max_index]
     print("class_name")
     print(class_name)
-
+    
+    end_time = perf_counter()
+    func_time = end_time - start_time
+    model_time = end_inference - start_inference
+    
+    print(f"MODEL TIME = {model_time}")
+    print(f"REMAINING TIME = {func_time - model_time}")
     # Display result
     if max_value > 0.196:  # Adjust threshold as needed
         return f"It {confidence} a <a href='https://www.google.com/search?q={class_name}'>{class_name}</a> in the picture"

@@ -2,7 +2,7 @@ import azure.functions as func
 import datetime
 import json
 import logging
-import time
+from time import perf_counter
 
 import os
 import tensorflow as tf
@@ -17,6 +17,8 @@ app = func.FunctionApp()
 
 def solve(input_string):
     # Load the model
+    start_time = perf_counter()
+
     model_path = 'classify/mobilenet_v1_1.0_224_quant.tflite'
     interpreter = tf.lite.Interpreter(model_path=model_path)
     interpreter.allocate_tensors()
@@ -48,10 +50,9 @@ def solve(input_string):
     interpreter.set_tensor(input_details[0]['index'], input_tensor)
 
     # Run inference
-    start_time = time.time()
+    start_inference = perf_counter()
     interpreter.invoke()
-    end_time = time.time()
-    logging.info(f"model inference: {end_time - start_time} seconds")
+    end_inference = perf_counter()
 
     # Get output tensor
     output_details = interpreter.get_output_details()
@@ -72,7 +73,13 @@ def solve(input_string):
 
     # Get class name
     class_name = labels[max_index]
-
+    
+    end_time = perf_counter()
+    func_time = end_time - start_time
+    model_time = end_inference - start_inference
+    
+    print(f"MODEL TIME = {model_time}")
+    print(f"REMAINING TIME = {func_time - model_time}")
     # Display result
     if max_value > 0.196:  # Adjust threshold as needed
         return f"It {confidence} a <a href='https://www.google.com/search?q={class_name}'>{class_name}</a> in the picture"

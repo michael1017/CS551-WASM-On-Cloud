@@ -15,6 +15,7 @@ import sys
 
 def solve(input_string):
     # Load the model
+    start_time = perf_counter()
     model_path = 'classify/mobilenet_v1_1.0_224_quant.tflite'
     interpreter = tf.lite.Interpreter(model_path=model_path)
     interpreter.allocate_tensors()
@@ -71,6 +72,12 @@ def solve(input_string):
     # Get class name
     class_name = labels[max_index]
 
+    end_time = perf_counter()
+    func_time = end_time - start_time
+    model_time = end_inference - start_inference
+    
+    print(f"MODEL TIME = {model_time}")
+    print(f"REMAINING TIME = {func_time - model_time}")
     # Display result
     if max_value > 0.196:  # Adjust threshold as needed
         return f"It {confidence} a <a href='https://www.google.com/search?q={class_name}'>{class_name}</a> in the picture"
@@ -80,6 +87,7 @@ def solve(input_string):
 
 @functions_framework.http
 def hello_http(request):
+    
     """HTTP Cloud Function.
     Args:
         request (flask.Request): The request object.
@@ -92,14 +100,11 @@ def hello_http(request):
     request_json = request.get_json(silent=True)
     request_args = request.args
 
-    start_time = perf_counter()
+    
     if request_json and 'img' in request_json:
         result = solve(request_json['img'])
     elif request_args and 'img' in request_args:
         result = solve(request_args['img'])
     else:
         result = 'No Match Handler'
-    end_time = perf_counter()
-    
-    print(f"total time: {end_time - start_time}")
     return '{}'.format(result)
