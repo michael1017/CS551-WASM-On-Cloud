@@ -17,6 +17,7 @@ def convert_image_to_hex(file_name):
 def test_latency(num_requests, url_link):
     avg_latency = 0
     image_hex = []
+    times = []
     for (dir_path, dir_names, file_names) in os.walk("Images"):        
         for file_name in file_names:
             file_path = dir_path + "/" + file_name
@@ -32,7 +33,10 @@ def test_latency(num_requests, url_link):
         # print(response.text)
         end = perf_counter()
 
-        avg_latency += (end - start)
+        times.append((end - start))
+        # avg_latency += (end - start)
+    avg_latency = sum(times)
+    # variance(times)
     avg_latency /= num_requests
     print(avg_latency)
     return avg_latency
