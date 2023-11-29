@@ -32,7 +32,18 @@ def test_latency(num_requests, url_link):
         # FOR GCP AND AZURE DO THE FOLLOWING SAME IN SCALE TEST
         # image_object = {"img": image_object}
         # response = requests.post(url_link,json=image_object)
-        response = requests.post(url_link, data=image_object)
+        
+        response = None
+        if is_gcp_test:
+            data = {
+                "img": image_object
+            }
+            headers = {
+                "Content-Type": "application/json"
+            }
+            response = requests.post(url_link, headers=headers, json=data)
+        else:
+            response = requests.post(url_link, data=image_object)
         # print(response.text)
         end = perf_counter()
 
@@ -52,9 +63,20 @@ def record_data(url_link):
     return [(num_requests, test_latency(num_requests, url_link)) for num_requests in [1, 10, 20, 30, 40, 50, 100]]        
 
 
+is_gcp_test = False
 if __name__ == "__main__":
     # REPLACE URL with GCP and AZURE
-    url_link = "https://xb28uuj612.execute-api.us-east-2.amazonaws.com/default/aws_lambda_classify_pytorch_wasm"
-    print(url_link)
+    # url_link = "https://xb28uuj612.execute-api.us-east-2.amazonaws.com/default/aws_lambda_classify_pytorch_wasm"
+    
+    # AWS WASM
+    # url_link = "https://51wrp9c8ya.execute-api.us-east-1.amazonaws.com/default/classify"
 
+    # AZURE MOBILENET
+    # url_link = "https://classifytf2.azurewebsites.net/api/classify"
+    
+    # GCP MOBILENET
+    url_link = "https://us-central1-curious-context-406603.cloudfunctions.net/function-1"
+    is_gcp_test = True
+
+    print(url_link)
     print(record_data(url_link))

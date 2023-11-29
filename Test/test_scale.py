@@ -16,7 +16,18 @@ def convert_image_to_hex(file_name):
     return hex_value
 
 def post_request(url_link, image):
-    response = requests.post(url_link, data=image)
+    response = None
+    if is_gcp_test:
+        data = {
+            "img": image
+        }
+        headers = {
+            "Content-Type": "application/json"
+        }
+        response = requests.post(url_link, headers=headers, json=data)
+    else:
+        response = requests.post(url_link, data=image)
+    #print(response.text)
 
 def scale_test(num_users, url_link):
     total_latency = 0
@@ -52,7 +63,20 @@ def record_data(url_link):
     return [(num_users, scale_test(num_users, url_link)) for num_users in [1, 10, 20, 30, 40, 50, 100]]        
 
 
+is_gcp_test = False
 if __name__ == "__main__":
-    url_link = "https://xb28uuj612.execute-api.us-east-2.amazonaws.com/default/aws_lambda_classify_pytorch_wasm"
+    # AWS PYTHON
+    # url_link = "https://xb28uuj612.execute-api.us-east-2.amazonaws.com/default/aws_lambda_classify_pytorch_wasm"
+    
+    # AWS WASM
+    # url_link = "https://51wrp9c8ya.execute-api.us-east-1.amazonaws.com/default/classify"
+
+    # AZURE MOBILENET
+    # url_link = "https://classifytf2.azurewebsites.net/api/classify"
+    
+    # GCP 
+    url_link = "https://us-central1-curious-context-406603.cloudfunctions.net/function-1"
+    is_gcp_test = True
+
     print(url_link)
     print(record_data(url_link))
