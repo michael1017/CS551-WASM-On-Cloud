@@ -92,10 +92,7 @@ def classify(req: func.HttpRequest) -> func.HttpResponse:
     req_body_bytes = req.get_body()
     req_body = req_body_bytes.decode("utf-8")
 
-    start_time = time.time()
     result = solve(req_body)
-    end_time = time.time()
-    logging.info(f"total time: {end_time - start_time} seconds")
     
     return func.HttpResponse(
         result,
